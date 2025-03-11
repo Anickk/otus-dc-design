@@ -30,3 +30,34 @@ Loopback - 10.200.0.0/24
 | Spine 2      | Loopback0 | 10.200.0.2/32  | 10.200.0.0/24   |
 | Leaf 1       | Loopback0 | 10.200.0.3/32  | 10.200.0.0/24   |
 | Leaf 2       | Loopback0 | 10.200.0.4/32  | 10.200.0.0/24   |
+
+### Конфигурация
+#### SPINE-1
+```
+root@SPINE-1# show interfaces 
+xe-0/0/0 {
+    description LEAF-1;
+    unit 0 {
+        family inet {
+            address 10.100.0.0/31;
+        }
+    }
+}
+xe-0/0/1 {
+    description LEAF-2;
+    unit 0 {
+        family inet {
+            address 10.100.0.2/31;
+        }
+    }
+}
+lo0 {                                   
+    unit 0 {
+        family inet {
+            address 10.200.0.1/32;
+        }
+    }
+}
+
+{master:0}[edit]
+```
