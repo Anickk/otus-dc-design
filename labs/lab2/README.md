@@ -18,7 +18,7 @@ protocols ospf {
 ## Проверка
 
 Проверяем статус соседей:
-###LEAF-1
+### LEAF-1
 ```
 root@LEAF-1> show ospf neighbor 
 Address          Interface              State     ID               Pri  Dead
