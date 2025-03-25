@@ -103,4 +103,20 @@ Network  10.100.0.7       10.200.0.4       0x80000002   650  0x22 0xa38   32
 ```
 Мы идим LSA type 1 и 2 как и должно быть, * перед LSA означает, что она сгенерирована локально.
 
+Проверим связность между Leaf-1 и Leaf-2:
+```
+root@LEAF-1> ping 10.200.0.4       
+PING 10.200.0.4 (10.200.0.4): 56 data bytes
+64 bytes from 10.200.0.4: icmp_seq=0 ttl=63 time=114.983 ms
+64 bytes from 10.200.0.4: icmp_seq=1 ttl=63 time=210.116 ms
+64 bytes from 10.200.0.4: icmp_seq=2 ttl=63 time=313.473 ms
+64 bytes from 10.200.0.4: icmp_seq=3 ttl=63 time=210.179 ms
+64 bytes from 10.200.0.4: icmp_seq=4 ttl=63 time=113.450 ms
+64 bytes from 10.200.0.4: icmp_seq=5 ttl=63 time=111.847 ms
+64 bytes from 10.200.0.4: icmp_seq=6 ttl=63 time=213.174 ms
+^C
+--- 10.200.0.4 ping statistics ---
+7 packets transmitted, 7 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 111.847/183.889/313.473/69.620 ms
+```
 Как видно из выводов, маршруты до всех Lo интерфейсах есть в таблицах маршрутизации, можно приступать к настройке overlay.
