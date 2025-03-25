@@ -4,16 +4,18 @@
 
 Конфигурация на всех коммутаторах идентичная:
 ```
-ospf {
-    area 0.0.0.0 {
-        interface xe-0/0/0.0 {
-            interface-type p2p;
-        }
-        interface xe-0/0/1.0 {
-            interface-type p2p;
-        }
-        interface lo0.0 {
-            passive;
+protocols {
+    ospf {
+        area 0.0.0.0 {
+            interface xe-0/0/0.0 {
+                interface-type p2p;
+            }
+            interface xe-0/0/1.0 {
+                interface-type p2p;
+            }
+            interface lo0.0 {
+                passive;
+            }
         }
     }
 }
