@@ -86,4 +86,21 @@ inet.0: 13 destinations, 13 routes (13 active, 0 holddown, 0 hidden)
 inet6.0: 2 destinations, 2 routes (2 active, 0 holddown, 0 hidden)
 ```
 
+Заглянем в ospf database:
+```
+root@LEAF-1> show ospf database    
+
+    OSPF database, Area 0.0.0.0
+ Type       ID               Adv Rtr           Seq      Age  Opt  Cksum  Len 
+Router   10.200.0.1       10.200.0.1       0x80000005  1675  0x22 0xbe16  60
+Router   10.200.0.2       10.200.0.2       0x80000005  1674  0x22 0x9a27  60
+Router  *10.200.0.3       10.200.0.3       0x80000002  1673  0x22 0x6765  60
+Router   10.200.0.4       10.200.0.4       0x80000006  1748  0x22 0x8239  60
+Network  10.100.0.0       10.200.0.1       0x80000001  1678  0x22 0x54fa  32
+Network  10.100.0.3       10.200.0.4       0x80000001  1752  0x22 0x2622  32
+Network  10.100.0.4       10.200.0.2       0x80000001  1674  0x22 0x3019  32
+Network  10.100.0.7       10.200.0.4       0x80000002   650  0x22 0xa38   32
+```
+Мы идим LSA type 1 и 2 как и должно быть, * перед LSA означает, что она сгенерирована локально.
+
 Как видно из выводов, маршруты до всех Lo интерфейсах есть в таблицах маршрутизации, можно приступать к настройке overlay.
