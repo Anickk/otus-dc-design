@@ -83,3 +83,5 @@ inet.0: 13 destinations, 13 routes (13 active, 0 holddown, 0 hidden)
 
 inet6.0: 2 destinations, 2 routes (2 active, 0 holddown, 0 hidden)
 ```
+
+Как видно из выводов, маршруты до всех Lo интерфейсах есть в таблицах маршртизации, можно приступать к настройке overlay.
