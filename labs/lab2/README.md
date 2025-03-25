@@ -18,6 +18,7 @@ protocols ospf {
 ## Проверка
 
 Проверяем статус соседей:\
+
 LEAF-1:
 ```
 root@LEAF-1> show ospf neighbor 
@@ -35,6 +36,7 @@ Address          Interface              State     ID               Pri  Dead
 Видим по два соседа в статусе Full на каждом LEAF, соотетственно со стороны SPINE проверять не имеет смысла.
 
 Проверяем распрространение маршрутов lo интерфейсов:\
+
 LEAF-1:
 ```
 root@LEAF-1> show route protocol ospf 
