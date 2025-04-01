@@ -82,8 +82,30 @@ root@SPINE-1> show bfd session
                                                   Detect   Transmit
 Address                  State     Interface      Time     Interval  Multiplier
 10.100.0.1               Up        xe-0/0/0.0     0.900     0.300        3   
-10.100.0.3               Up        xe-0/0/1.0     0.900     0.300        3   
+10.100.0.3               Up        xe-0/0/1.0     0.900     0.300        3
 
 2 sessions, 2 clients
 Cumulative transmit rate 6.7 pps, cumulative receive rate 6.7 pps
+```
+
+Проверяем маршруты is-is:
+```
+root@SPINE-1> show route protocol isis 
+
+inet.0: 11 destinations, 11 routes (11 active, 0 holddown, 0 hidden)
++ = Active Route, - = Last Active, * = Both
+
+10.100.0.4/31      *[IS-IS/18] 00:14:58, metric 20
+                    > to 10.100.0.1 via xe-0/0/0.0
+10.100.0.6/31      *[IS-IS/18] 00:14:54, metric 20
+                    > to 10.100.0.3 via xe-0/0/1.0
+10.200.0.2/32      *[IS-IS/18] 00:14:54, metric 20
+                    > to 10.100.0.1 via xe-0/0/0.0
+                      to 10.100.0.3 via xe-0/0/1.0
+10.200.0.4/32      *[IS-IS/18] 00:14:54, metric 10
+                    > to 10.100.0.3 via xe-0/0/1.0
+
+iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
+
+inet6.0: 2 destinations, 2 routes (2 active, 0 holddown, 0 hidden)
 ```
