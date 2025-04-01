@@ -11,7 +11,7 @@
 | Leaf 2       | 65012 |
 
 Настройки будут показаны на примере SPINE-1, конфигурация везде иденично за исключением адресов пиров, AS и router-id./
-Настроим политики анонсов и балансировки:
+Настройка политики анонсов и балансировки:
 ```
 policy-options {
     policy-statement lo0_in {
@@ -36,8 +36,10 @@ policy-options {
             load-balance per-packet;
         }
 ```
+Принимаем все адреса /32 входящие в сеть 10.200.0.0/24, включаем редистрибьюцию для коннектед сети lo0./
+На Juniper нет мнимого DENY правила, поэтому правильнее было бы добавить команду set policy-options policy-statement lo0_in then reject, но мы экспортируем только адреса lo везде, поэтому политику импорта можно не использовать вовсе.
 
-Настроим router-id, local AS и применим политику балансировки:
+Настройка router-id, local AS и применение политику балансировки:
 ```
 routing-options {
     router-id 10.200.0.1;
@@ -47,3 +49,32 @@ routing-options {
     }
 }
 ```
+
+Настройка BGP, включим сразу bfd:
+```
+protocols {
+    bgp {
+        group UNDERLAY {                
+            type external;
+            import lo0_in;
+            export lo0_out;
+            multipath {
+                multiple-as;
+            }
+            bfd-liveness-detection {
+                minimum-interval 1000;
+            }
+            neighbor 10.100.0.1 {
+                description LEAF-1;
+                peer-as 65011;
+            }
+            neighbor 10.100.0.3 {
+                description LEAF-2;
+                peer-as 65012;
+            }
+        }
+    }
+}
+```
+
+## Проверка
