@@ -66,3 +66,24 @@ interfaces {
 
 
 ## Проверка
+
+Все проверки будут выполнены на примере SPINE-1, на остальных коммутаторах считаем выводы аналогичными.
+
+Проверяем сходимость is-is:
+```
+root@SPINE-1> show isis adjacency 
+Interface             System         L State        Hold (secs) SNPA
+xe-0/0/0.0            LEAF-1         2  Up                   20
+xe-0/0/1.0            LEAF-2         2  Up                   23
+```
+Проверяем статус bfd:
+```
+root@SPINE-1> show bfd session 
+                                                  Detect   Transmit
+Address                  State     Interface      Time     Interval  Multiplier
+10.100.0.1               Up        xe-0/0/0.0     0.900     0.300        3   
+10.100.0.3               Up        xe-0/0/1.0     0.900     0.300        3   
+
+2 sessions, 2 clients
+Cumulative transmit rate 6.7 pps, cumulative receive rate 6.7 pps
+```
