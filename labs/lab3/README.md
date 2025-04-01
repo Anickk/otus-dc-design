@@ -112,6 +112,53 @@ iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
 inet6.0: 2 destinations, 2 routes (2 active, 0 holddown, 0 hidden)
 ```
 
+Посмотрим в lsdb и проверим NET всех узлов:
+```
+root@SPINE-1> show isis database detail                                     
+IS-IS level 1 link-state database:
+
+IS-IS level 2 link-state database:
+
+SPINE-1.00-00 Sequence: 0x13, Checksum: 0xd1c1, Lifetime: 736 secs
+   IS neighbor: LEAF-1.00                     Metric:       10
+   IS neighbor: LEAF-2.00                     Metric:       10
+   IP prefix: 10.100.0.0/31                   Metric:       10 Internal Up
+   IP prefix: 10.100.0.2/31                   Metric:       10 Internal Up
+   IP prefix: 10.200.0.1/32                   Metric:        0 Internal Up
+
+SPINE-2.00-00 Sequence: 0x12, Checksum: 0x5f47, Lifetime: 716 secs
+   IS neighbor: LEAF-1.00                     Metric:       10
+   IS neighbor: LEAF-2.00                     Metric:       10
+   IP prefix: 10.100.0.4/31                   Metric:       10 Internal Up
+   IP prefix: 10.100.0.6/31                   Metric:       10 Internal Up
+   IP prefix: 10.200.0.2/32                   Metric:        0 Internal Up
+
+LEAF-1.00-00 Sequence: 0x10, Checksum: 0xe7a7, Lifetime: 718 secs
+   IS neighbor: SPINE-1.00                    Metric:       10
+   IS neighbor: SPINE-2.00                    Metric:       10
+   IP prefix: 10.100.0.0/31                   Metric:       10 Internal Up
+   IP prefix: 10.100.0.4/31                   Metric:       10 Internal Up
+   IP prefix: 10.200.0.3/32                   Metric:        0 Internal Up
+
+LEAF-2.00-00 Sequence: 0x13, Checksum: 0x653b, Lifetime: 734 secs
+   IS neighbor: SPINE-1.00                    Metric:       10
+   IS neighbor: SPINE-2.00                    Metric:       10
+   IP prefix: 10.100.0.2/31                   Metric:       10 Internal Up
+   IP prefix: 10.100.0.6/31                   Metric:       10 Internal Up
+   IP prefix: 10.200.0.4/32                   Metric:        0 Internal Up
+
+{master:0}
+root@SPINE-1> show isis hostname           
+IS-IS hostname database:
+System ID      Hostname                                         Type
+0000.0000.0001 SPINE-1                                          Static  
+0000.0000.0002 SPINE-2                                          Dynamic 
+0000.0000.0003 LEAF-1                                           Dynamic 
+0000.0000.0004 LEAF-2                                           Dynamic 
+
+{master:0}
+```
+
 Проверяем доступность узлов:
 ```
 root@SPINE-1> ping 10.200.0.2 
