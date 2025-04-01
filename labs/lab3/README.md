@@ -38,13 +38,11 @@ protocols {
 ```
 interfaces {                            
     xe-0/0/0 {
-        description LEAF-1;
         unit 0 {
             family iso;
         }
     }
     xe-0/0/1 {
-        description LEAF-2;
         unit 0 {
             family iso;
         }
@@ -65,3 +63,6 @@ interfaces {
 | Spine 2      | 49.0001.0000.0000.0002.00 |
 | Leaf 1       | 49.0001.0000.0000.0003.00 |
 | Leaf 2       | 49.0001.0000.0000.0004.00 |
+
+
+## Проверка
