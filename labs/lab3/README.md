@@ -92,20 +92,61 @@ Cumulative transmit rate 6.7 pps, cumulative receive rate 6.7 pps
 ```
 root@SPINE-1> show route protocol isis 
 
-inet.0: 11 destinations, 11 routes (11 active, 0 holddown, 0 hidden)
+inet.0: 12 destinations, 12 routes (12 active, 0 holddown, 0 hidden)
 + = Active Route, - = Last Active, * = Both
 
-10.100.0.4/31      *[IS-IS/18] 00:14:58, metric 20
+10.100.0.4/31      *[IS-IS/18] 00:27:27, metric 20
                     > to 10.100.0.1 via xe-0/0/0.0
-10.100.0.6/31      *[IS-IS/18] 00:14:54, metric 20
+10.100.0.6/31      *[IS-IS/18] 00:27:23, metric 20
                     > to 10.100.0.3 via xe-0/0/1.0
-10.200.0.2/32      *[IS-IS/18] 00:14:54, metric 20
+10.200.0.2/32      *[IS-IS/18] 00:27:23, metric 20
                     > to 10.100.0.1 via xe-0/0/0.0
                       to 10.100.0.3 via xe-0/0/1.0
-10.200.0.4/32      *[IS-IS/18] 00:14:54, metric 10
+10.200.0.3/32      *[IS-IS/18] 00:00:19, metric 10
+                    > to 10.100.0.1 via xe-0/0/0.0
+10.200.0.4/32      *[IS-IS/18] 00:27:23, metric 10
                     > to 10.100.0.3 via xe-0/0/1.0
 
 iso.0: 1 destinations, 1 routes (1 active, 0 holddown, 0 hidden)
 
 inet6.0: 2 destinations, 2 routes (2 active, 0 holddown, 0 hidden)
 ```
+
+Проверяем доступность узлов:
+```
+root@SPINE-1> ping 10.200.0.2 
+PING 10.200.0.2 (10.200.0.2): 56 data bytes
+64 bytes from 10.200.0.2: icmp_seq=1 ttl=63 time=227.520 ms
+64 bytes from 10.200.0.2: icmp_seq=2 ttl=63 time=340.996 ms
+64 bytes from 10.200.0.2: icmp_seq=3 ttl=63 time=358.726 ms
+^C
+--- 10.200.0.2 ping statistics ---
+4 packets transmitted, 3 packets received, 25% packet loss
+round-trip min/avg/max/stddev = 227.520/309.081/358.726/58.125 ms
+
+{master:0}
+root@SPINE-1> ping 10.200.0.3    
+PING 10.200.0.3 (10.200.0.3): 56 data bytes
+64 bytes from 10.200.0.3: icmp_seq=0 ttl=64 time=211.128 ms
+64 bytes from 10.200.0.3: icmp_seq=1 ttl=64 time=206.241 ms
+64 bytes from 10.200.0.3: icmp_seq=2 ttl=64 time=114.520 ms
+^C
+--- 10.200.0.3 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 114.520/177.296/211.128/44.434 ms
+
+{master:0}
+root@SPINE-1> ping 10.200.0.4    
+PING 10.200.0.4 (10.200.0.4): 56 data bytes
+64 bytes from 10.200.0.4: icmp_seq=0 ttl=64 time=219.067 ms
+64 bytes from 10.200.0.4: icmp_seq=1 ttl=64 time=232.134 ms
+64 bytes from 10.200.0.4: icmp_seq=2 ttl=64 time=210.195 ms
+^C
+--- 10.200.0.4 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max/stddev = 210.195/220.465/232.134/9.011 ms
+
+{master:0}
+```
+
+Все адреса лупбеков доступны, можно приступать к конфигураии overlay
