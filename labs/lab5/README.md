@@ -159,3 +159,101 @@ interfaces {
         }
     }
 ```
+
+На ВМ настроены адреса 10.10.10.200 и 10.10.10.100, проверяем связность:
+```
+gns3@box:~$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN 
+    link/ether 46:1a:a4:f8:9e:60 brd ff:ff:ff:ff:ff:ff
+3: tunl0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+4: ip_vti0@NONE: <NOARP> mtu 1364 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 50:9d:51:00:09:00 brd ff:ff:ff:ff:ff:ff
+    inet 10.10.10.250/24 brd 10.10.10.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::529d:51ff:fe00:900/64 scope link 
+       valid_lft forever preferred_lft forever
+gns3@box:~$ sudo ifconfig eth0 10.10.10.100 netmask 255.255.255.0
+gns3@box:~$ ping 10.10.10.200
+PING 10.10.10.200 (10.10.10.200): 56 data bytes
+64 bytes from 10.10.10.200: seq=0 ttl=64 time=520.690 ms
+64 bytes from 10.10.10.200: seq=1 ttl=64 time=436.920 ms
+64 bytes from 10.10.10.200: seq=2 ttl=64 time=464.149 ms
+64 bytes from 10.10.10.200: seq=3 ttl=64 time=315.563 ms
+64 bytes from 10.10.10.200: seq=4 ttl=64 time=331.791 ms
+64 bytes from 10.10.10.200: seq=5 ttl=64 time=304.921 ms
+64 bytes from 10.10.10.200: seq=6 ttl=64 time=322.065 ms
+64 bytes from 10.10.10.200: seq=7 ttl=64 time=351.362 ms
+64 bytes from 10.10.10.200: seq=8 ttl=64 time=310.064 ms
+64 bytes from 10.10.10.200: seq=9 ttl=64 time=239.116 ms
+64 bytes from 10.10.10.200: seq=10 ttl=64 time=234.422 ms
+64 bytes from 10.10.10.200: seq=11 ttl=64 time=451.534 ms
+64 bytes from 10.10.10.200: seq=12 ttl=64 time=339.804 ms
+64 bytes from 10.10.10.200: seq=13 ttl=64 time=357.276 ms
+64 bytes from 10.10.10.200: seq=14 ttl=64 time=380.169 ms
+64 bytes from 10.10.10.200: seq=15 ttl=64 time=297.154 ms
+64 bytes from 10.10.10.200: seq=16 ttl=64 time=333.167 ms
+64 bytes from 10.10.10.200: seq=17 ttl=64 time=259.404 ms
+64 bytes from 10.10.10.200: seq=18 ttl=64 time=293.853 ms
+^C
+--- 10.10.10.200 ping statistics ---
+20 packets transmitted, 19 packets received, 5% packet loss
+round-trip min/avg/max = 234.422/344.390/520.690 ms
+```
+
+Связность есть, заглянем в таблицу маршрутизации на коммутаторе, будем смотреть в default-switch чтобы видеть и локальные маршруты:
+```
+root@LEAF-1> show route table default-switch.evpn.0 
+
+default-switch.evpn.0: 4 destinations, 6 routes (4 active, 0 holddown, 0 hidden)
++ = Active Route, - = Last Active, * = Both
+
+2:10.200.0.3:1::100::50:9d:51:00:09:00/304 MAC/IP        
+                   *[EVPN/170] 00:06:28
+                      Indirect
+2:10.200.0.4:1::100::50:32:93:00:08:00/304 MAC/IP        
+                   *[BGP/170] 00:06:25, localpref 100, from 10.200.0.1
+                      AS path: I, validation-state: unverified
+                      to 10.100.0.0 via xe-0/0/0.0
+                    > to 10.100.0.4 via xe-0/0/1.0
+                    [BGP/170] 00:06:25, localpref 100, from 10.200.0.2
+                      AS path: I, validation-state: unverified
+                      to 10.100.0.0 via xe-0/0/0.0
+                    > to 10.100.0.4 via xe-0/0/1.0
+3:10.200.0.3:1::100::10.200.0.3/248 IM            
+                   *[EVPN/170] 00:06:33
+                      Indirect
+3:10.200.0.4:1::100::10.200.0.4/248 IM            
+                   *[BGP/170] 00:06:27, localpref 100, from 10.200.0.1
+                      AS path: I, validation-state: unverified
+                    > to 10.100.0.0 via xe-0/0/0.0
+                      to 10.100.0.4 via xe-0/0/1.0
+                    [BGP/170] 00:06:27, localpref 100, from 10.200.0.2
+                      AS path: I, validation-state: unverified
+                    > to 10.100.0.0 via xe-0/0/0.0
+                      to 10.100.0.4 via xe-0/0/1.0
+
+{master:0}
+```
+Тут мы видим локальные и удаленные type 2 и 3 маршруты, но в type 2 видим только mac, и не видим ip. Однако длина префикса 304 бита, из чего можно сделать вывод что адрес включен в него, просто он не интерпритируется в читаемый вид данной платформой. Скорее всего, это обусловлено тем, что в виртуальной среде используются vqfx с версией junos 18, в которой нельзя включить arp-suppression без использования irb. В 20+ версиях оно включено по умолчанию, и поидее, там должны быть и маршруты 2ого типа с адресами.
+
+Заглянем в evpn:
+```
+root@LEAF-1> show evpn database 
+Instance: default-switch
+VLAN  DomainId  MAC address        Active source                  Timestamp        IP address
+     100        50:32:93:00:08:00  10.200.0.4                     Apr 15 19:36:26
+     100        50:9d:51:00:09:00  xe-0/0/2.0                     Apr 15 19:36:21
+
+{master:0}
+```
+
+Как видно, все необходимые маршруты и мак адреса извесны, трафик между ВМ ходит корректно.
