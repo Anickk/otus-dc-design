@@ -42,11 +42,13 @@ switch-options {
 
 Настройка evpn, укажем инкапсуляцию, режим работы, и разрешим инкапсуляцию для всех vni, чтобы не задавать их в ручную:
 ```
-evpn {                              
-        encapsulation vxlan;
-        multicast-mode ingress-replication;
-        extended-vni-list all;
-    }
+protocols {
+    evpn {                              
+            encapsulation vxlan;
+            multicast-mode ingress-replication;
+            extended-vni-list all;
+        }
+}
 ```
 
 Настройка bgp overlay:
