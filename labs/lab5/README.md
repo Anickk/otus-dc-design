@@ -109,6 +109,27 @@ protocols {
 ```
 cluster 10.200.0.1 - включает RR. на другом spine другой кластер id.
 
+Проверка bgp соседств на leaf-1:
+```
+root@LEAF-1> show bgp summary 
+Groups: 1 Peers: 2 Down peers: 0
+Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
+bgp.evpn.0           
+                       0          0          0          0          0          0
+Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
+10.200.0.1            65000        185        183       0       0     1:15:46 Establ
+  bgp.evpn.0: 0/0/0/0
+  default-switch.evpn.0: 0/0/0/0
+  __default_evpn__.evpn.0: 0/0/0/0
+10.200.0.2            65000        181        179       0       0     1:14:08 Establ
+  bgp.evpn.0: 0/0/0/0
+  default-switch.evpn.0: 0/0/0/0
+  __default_evpn__.evpn.0: 0/0/0/0
+
+{master:0}
+```
+Соседства поднялись, можно переходить к следующему этапу
+
 ---
 ## Конфигурация l2 vni 
 
