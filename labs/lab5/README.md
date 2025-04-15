@@ -71,3 +71,40 @@ protocols {
         }
     }
 ```
+---
+### Spine-1:
+Тут мы настраиваем только параметры для bgp, балансировку и сам overlay:
+```
+policy-options {
+    policy-statement load-balancing-policy {
+        then {
+            load-balance per-packet;
+        }
+    }
+}
+routing-options {
+    router-id 10.200.0.1;
+    autonomous-system 65000;
+    forwarding-table {
+        export load-balancing-policy;   
+    }
+}
+protocols {
+    bgp {
+        group OVERLAY {
+            type internal;
+            local-address 10.200.0.1;
+            family evpn {
+                signaling;
+            }
+            cluster 10.200.0.1;
+            neighbor 10.200.0.3 {
+                description LEAF-1;
+            }
+            neighbor 10.200.0.4 {
+                description LEAF-2;
+            }
+        }
+    }
+```
+cluster 10.200.0.1 - включает RR. на другом spine другой кластер id.
