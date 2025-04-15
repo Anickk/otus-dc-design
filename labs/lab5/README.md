@@ -133,7 +133,29 @@ Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn St
 ---
 ## Конфигурация l2 vni 
 
-Пример будет представлен для LEAF-1, на втором коммутаторе конфиг аналогичен:
+Пример будет представлен для LEAF-1, на втором коммутаторе конфиг аналогичен.
+
+Настроим порт в сторону сервера и vlan с vni:
 ```
-ddd
+vlans {
+    v100 {
+        description L2TEST;
+        vlan-id 100;
+        vxlan {
+            vni 100;
+        }
+    }
+}
+interfaces {                            
+    xe-0/0/2 {
+        description HOST-1;
+        unit 0 {
+            family ethernet-switching {
+                interface-mode access;  
+                vlan {
+                    members v100;
+                }
+            }
+        }
+    }
 ```
