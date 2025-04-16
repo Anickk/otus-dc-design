@@ -1,0 +1,159 @@
+version 18.1R1.9;
+system {
+    host-name SPINE-2;
+    root-authentication {
+        encrypted-password "$6$HNRYXBqW$6V2pkLKNbG0n2sI1jsMBi8IpXqKdYehqNuInYDE42j28MhAQRhcFRr1S/fioB5nh3U6qz0KSkV.rJYu2Hf6GI."; ## SECRET-DATA
+        ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"; ## SECRET-DATA
+    }
+    login {
+        user vagrant {
+            uid 2000;
+            class super-user;
+            authentication {
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            root-login allow;
+        }
+        netconf {
+            ssh;
+        }
+        rest {
+            http {
+                port 8080;
+            }
+            enable-explorer;
+        }
+    }
+    syslog {                            
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    extensions {
+        providers {
+            juniper {
+                license-type juniper deployment-scope commercial;
+            }
+            chef {
+                license-type juniper deployment-scope commercial;
+            }
+        }
+    }
+}
+interfaces {                            
+    xe-0/0/0 {
+        description LEAF-1;
+        unit 0 {
+            family inet {
+                address 10.100.0.4/31;
+            }
+            family iso;
+        }
+    }
+    xe-0/0/1 {
+        description LEAF-2;
+        unit 0 {
+            family inet {
+                address 10.100.0.6/31;
+            }
+            family iso;
+        }
+    }
+    em1 {
+        unit 0 {
+            family inet {
+                address 169.254.0.2/24;
+            }                           
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.200.0.2/32;
+            }
+            family iso {
+                address 49.0001.0000.0000.0002.00;
+            }
+        }
+    }
+}
+forwarding-options {
+    storm-control-profiles default {
+        all;
+    }
+}
+routing-options {
+    router-id 10.200.0.2;
+    autonomous-system 65000;
+    forwarding-table {
+        export load-balancing-policy;   
+    }
+}
+protocols {
+    bgp {
+        group OVERLAY {
+            type internal;
+            local-address 10.200.0.2;
+            family evpn {
+                signaling;
+            }
+            cluster 10.200.0.2;
+            neighbor 10.200.0.3 {
+                description LEAF-1;
+            }
+            neighbor 10.200.0.4 {
+                description LEAF-2;
+            }
+        }
+    }
+    isis {
+        level 1 disable;
+        level 2 {
+            authentication-key "$9$u5o.OEcrevL7-leaZ"; ## SECRET-DATA
+            authentication-type md5;
+            wide-metrics-only;
+        }
+        interface xe-0/0/0.0 {
+            point-to-point;
+            bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
+                minimum-interval 300;
+                multiplier 3;
+            }
+        }
+        interface xe-0/0/1.0 {
+            point-to-point;
+            bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
+                minimum-interval 300;
+                multiplier 3;
+            }
+        }
+        interface lo0.0 {
+            passive;
+        }
+    }                                   
+}
+policy-options {
+    policy-statement load-balancing-policy {
+        then {
+            load-balance per-packet;
+        }
+    }
+}
+vlans {
+    default {
+        vlan-id 1;
+    }
+}
+
+{master:0}
