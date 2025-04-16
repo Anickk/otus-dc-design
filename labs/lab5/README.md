@@ -256,4 +256,20 @@ VLAN  DomainId  MAC address        Active source                  Timestamp     
 {master:0}
 ```
 
+Посмотрим в мак тиаблицу:
+```
+root@LEAF-1# run show ethernet-switching table vlan-id 100 
+
+MAC flags (S - static MAC, D - dynamic MAC, L - locally learned, P - Persistent static
+           SE - statistics enabled, NM - non configured MAC, R - remote PE MAC, O - ovsdb MAC)
+
+
+Ethernet switching table : 3 entries, 3 learned
+Routing instance : default-switch
+   Vlan                MAC                 MAC      Logical                Active
+   name                address             flags    interface              source
+   v100                50:32:93:00:08:00   D        vtep.32769             10.200.0.4                    
+   v100                50:9d:51:00:09:00   D        xe-0/0/2.0
+```
+
 Как видно, все необходимые маршруты и мак адреса извесны, трафик между ВМ ходит корректно.
