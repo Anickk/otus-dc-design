@@ -95,15 +95,9 @@ interfaces {
             }
             mac 00:00:5e:00:53:01;
         }
-        unit 200 {
-            family inet {
-                address 10.10.20.1/24;  
-            }
-            mac 00:00:5e:00:53:01;
-        }
     }
     lo0 {
-        unit 0 {
+        unit 0 {                        
             family inet {
                 address 10.200.0.3/32;
             }
@@ -120,13 +114,13 @@ forwarding-options {
     ##
     ## Warning: configuration block ignored: unsupported platform (vqfx-10000)
     ##
-    vxlan-routing {                     
+    vxlan-routing {
         overlay-ecmp;
     }
 }
 routing-options {
     router-id 10.200.0.3;
-    autonomous-system 65000;
+    autonomous-system 65000;            
     forwarding-table {
         export load-balancing-policy;
         dynamic-list-next-hop;
@@ -143,13 +137,13 @@ protocols {
             type internal;
             local-address 10.200.0.3;
             family evpn {
-                signaling;              
+                signaling;
             }
             neighbor 10.200.0.1 {
                 description SPINE-1;
             }
             neighbor 10.200.0.2 {
-                description SPINE-2;
+                description SPINE-2;    
             }
         }
     }
@@ -165,12 +159,12 @@ protocols {
             bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
                 minimum-interval 300;
                 multiplier 3;
-            }                           
+            }
         }
         interface xe-0/0/1.0 {
             point-to-point;
             bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
-                minimum-interval 300;
+                minimum-interval 300;   
                 multiplier 3;
             }
         }
@@ -187,15 +181,14 @@ protocols {
 policy-options {
     policy-statement load-balancing-policy {
         then {
-            load-balance per-packet;    
+            load-balance per-packet;
         }
     }
 }
 routing-instances {
     WAN {
-        instance-type vrf;
+        instance-type vrf;              
         interface irb.100;
-        interface irb.200;
         route-distinguisher 10.200.0.3:100;
         vrf-target target:65001:1;
         vrf-table-label;
@@ -205,13 +198,19 @@ routing-instances {
             }
         }
         protocols {
-            evpn;
+            evpn {
+                ip-prefix-routes {
+                    advertise direct-nexthop;
+                    encapsulation vxlan;
+                    vni 65001;
+                }
+            }
         }
     }
 }
 switch-options {
-    vtep-source-interface lo0.0;        
-    route-distinguisher 10.200.0.3:1;
+    vtep-source-interface lo0.0;
+    route-distinguisher 10.200.0.3:1;   
     vrf-target {
         target:1:1;
         auto;
@@ -227,14 +226,6 @@ vlans {
         l3-interface irb.100;
         vxlan {
             vni 100;
-        }
-    }
-    v200 {
-        description L3TEST;
-        vlan-id 200;
-        l3-interface irb.200;
-        vxlan {                         
-            vni 200;
         }
     }
 }
