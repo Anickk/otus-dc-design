@@ -1,0 +1,242 @@
+version 18.1R1.9;
+system {
+    host-name LEAF-1;
+    root-authentication {
+        encrypted-password "$6$HNRYXBqW$6V2pkLKNbG0n2sI1jsMBi8IpXqKdYehqNuInYDE42j28MhAQRhcFRr1S/fioB5nh3U6qz0KSkV.rJYu2Hf6GI."; ## SECRET-DATA
+        ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"; ## SECRET-DATA
+    }
+    login {
+        user vagrant {
+            uid 2000;
+            class super-user;
+            authentication {
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            root-login allow;
+        }
+        netconf {
+            ssh;
+        }
+        rest {
+            http {
+                port 8080;
+            }
+            enable-explorer;
+        }
+    }
+    syslog {                            
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    extensions {
+        providers {
+            juniper {
+                license-type juniper deployment-scope commercial;
+            }
+            chef {
+                license-type juniper deployment-scope commercial;
+            }
+        }
+    }
+}
+interfaces {                            
+    xe-0/0/0 {
+        description SPINE-1;
+        unit 0 {
+            family inet {
+                address 10.100.0.1/31;
+            }
+            family iso;
+        }
+    }
+    xe-0/0/1 {
+        description SPINE-2;
+        unit 0 {
+            family inet {
+                address 10.100.0.5/31;
+            }
+            family iso;
+        }
+    }
+    xe-0/0/2 {
+        description HOST-1;
+        unit 0 {
+            family ethernet-switching {
+                interface-mode access;  
+                vlan {
+                    members v100;
+                }
+            }
+        }
+    }
+    em1 {
+        unit 0 {
+            family inet {
+                address 169.254.0.2/24;
+            }
+        }
+    }
+    irb {
+        unit 100 {
+            family inet {
+                address 10.10.10.1/24;
+            }
+            mac 00:00:5e:00:53:01;
+        }
+        unit 200 {
+            family inet {
+                address 10.10.20.1/24;  
+            }
+            mac 00:00:5e:00:53:01;
+        }
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.200.0.3/32;
+            }
+            family iso {
+                address 49.0001.0000.0000.0003.00;
+            }
+        }
+    }
+}
+forwarding-options {
+    storm-control-profiles default {
+        all;
+    }
+    ##
+    ## Warning: configuration block ignored: unsupported platform (vqfx-10000)
+    ##
+    vxlan-routing {                     
+        overlay-ecmp;
+    }
+}
+routing-options {
+    router-id 10.200.0.3;
+    autonomous-system 65000;
+    forwarding-table {
+        export load-balancing-policy;
+        dynamic-list-next-hop;
+        chained-composite-next-hop {
+            ingress {
+                evpn;
+            }
+        }
+    }
+}
+protocols {
+    bgp {
+        group OVERLAY {
+            type internal;
+            local-address 10.200.0.3;
+            family evpn {
+                signaling;              
+            }
+            neighbor 10.200.0.1 {
+                description SPINE-1;
+            }
+            neighbor 10.200.0.2 {
+                description SPINE-2;
+            }
+        }
+    }
+    isis {
+        level 1 disable;
+        level 2 {
+            authentication-key "$9$1I.RylvWLNVwMWUj"; ## SECRET-DATA
+            authentication-type md5;
+            wide-metrics-only;
+        }
+        interface xe-0/0/0.0 {
+            point-to-point;
+            bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
+                minimum-interval 300;
+                multiplier 3;
+            }                           
+        }
+        interface xe-0/0/1.0 {
+            point-to-point;
+            bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
+                minimum-interval 300;
+                multiplier 3;
+            }
+        }
+        interface lo0.0 {
+            passive;
+        }
+    }
+    evpn {
+        encapsulation vxlan;
+        multicast-mode ingress-replication;
+        extended-vni-list all;
+    }
+}
+policy-options {
+    policy-statement load-balancing-policy {
+        then {
+            load-balance per-packet;    
+        }
+    }
+}
+routing-instances {
+    WAN {
+        instance-type vrf;
+        interface irb.100;
+        interface irb.200;
+        route-distinguisher 10.200.0.3:100;
+        vrf-target target:65001:1;
+        vrf-table-label;
+        routing-options {
+            multipath {
+                vpn-unequal-cost equal-external-internal;
+            }
+        }
+        protocols {
+            evpn;
+        }
+    }
+}
+switch-options {
+    vtep-source-interface lo0.0;        
+    route-distinguisher 10.200.0.3:1;
+    vrf-target {
+        target:1:1;
+        auto;
+    }
+}
+vlans {
+    default {
+        vlan-id 1;
+    }
+    v100 {
+        description L3TEST;
+        vlan-id 100;
+        l3-interface irb.100;
+        vxlan {
+            vni 100;
+        }
+    }
+    v200 {
+        description L3TEST;
+        vlan-id 200;
+        l3-interface irb.200;
+        vxlan {                         
+            vni 200;
+        }
+    }
+}
+
+{master:0}
