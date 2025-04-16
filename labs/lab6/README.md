@@ -397,3 +397,6 @@ VLAN  DomainId  MAC address        Active source                  Timestamp     
 
 Файлы конфигурации(с использованием type 5 маршрутов):
 - [LEAF-1](LEAF-1)
+- [LEAF-2](LEAF-2)
+- [SPINE-1](SPINE-1)
+- [SPINE-2](SPINE-2)
