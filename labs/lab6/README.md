@@ -210,6 +210,7 @@ routing-instances {
     }
 }
 ```
+Так же удалим экспорт маршрутов 5ого типа - delete routing-instances WAN protocols evpn ip-prefix-routes/
 ВМ остаются каждая в своей сети.
 
 Проверим маршруты на 1ом лифе:
