@@ -665,3 +665,9 @@ WAN.inet.0: 11 destinations, 15 routes (11 active, 0 holddown, 0 hidden)
                       to 10.100.0.4 via xe-0/0/1.0
 ```
 Как мы видим, все работает.
+
+Файлы конфигурации(с использованием type 5 маршрутов):
+- [LEAF-1](LEAF-1)
+- [LEAF-2](LEAF-2)
+- [PE-1](PE-1)
+- [PE-2](PE-2)
