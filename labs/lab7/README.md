@@ -59,3 +59,88 @@ ip route 100.64.0.0 255.192.0.0 100.112.200.2
 
 Настроим PE маршрутизаторы. Настроим стык с ISP, статический default, подготовим агрегированный интерфейс в сторону лифов, и преднастроим bgp для экспорта дефолта и импорта внутренних сетей:
 ### PE-1
+```
+chassis {
+    aggregated-devices {
+        ethernet {
+            device-count 100;           
+        }
+    }
+}
+///Эта команда требуется для возможности использхования агрегатов на JunOS
+interfaces {
+    ge-0/0/0 {
+        description LEAF-1;
+        gigether-options {
+            802.3ad ae0;
+        }
+    }
+    ge-0/0/1 {
+        description LEAF-2;
+        gigether-options {
+            802.3ad ae0;
+        }
+    }
+    ge-0/0/2 {
+        description ISP;
+        unit 0 {
+            family inet {
+                address 100.111.100.2/24;
+            }
+        }                               
+    }
+    ae0 {
+        description LEAF;
+        aggregated-ether-options {
+            lacp {
+                active;
+            }
+        }
+        unit 0 {
+            family inet {
+                address 100.100.100.1/24;
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        route 0.0.0.0/0 next-hop 100.111.100.1;
+    }
+    autonomous-system 65100;
+}
+protocols {
+    bgp {                               
+        group LEAF {
+            type external;
+            family inet {
+                unicast;
+            }
+            export DEFAULT;
+            multipath multiple-as;
+            neighbor 100.100.100.2 {
+                description LEAF-1;
+                peer-as 65001;
+            }
+            neighbor 100.100.100.3 {
+                description LEAF-2;
+                peer-as 65002;
+            }
+        }
+    }
+}
+///Испотзовать будем eBGP
+policy-options {
+    policy-statement DEFAULT {
+        term DEFAUL {
+            from {                      
+                protocol static;
+                route-filter 0.0.0.0/0 exact;
+            }
+            then accept;
+        }
+        then reject;
+    }
+}
+///Экспортируется только default route, на импорт политика не требуется, по умолчанию принимается все.
+```
