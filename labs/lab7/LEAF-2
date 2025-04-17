@@ -215,9 +215,6 @@ protocols {
                 description SPINE-2;    
             }
         }
-        group LEAF {
-            multihop;
-        }
     }
     isis {
         level 1 disable;
@@ -286,6 +283,7 @@ routing-instances {
             bgp {
                 group PE {
                     type external;
+                    multihop;
                     family inet {
                         unicast;
                     }
