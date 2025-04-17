@@ -32,7 +32,7 @@
 ## Конфигурация:
 
 Подготовим роутеры ISP, адрес на uplink они получают по dhcp, нам требуется настроить даунлинк, nat и маршрутизацию во внутренние сети:
-# ISP-1
+### ISP-1
 ```
 ip nat inside source list 100 interface Ethernet0/1 overload
 interface Ethernet0/1
@@ -44,7 +44,7 @@ interface Ethernet0/0
  ip nat inside
 ip route 100.64.0.0 255.192.0.0 100.111.100.2
 ```
-# ISP-2
+### ISP-2
 ```
 ip nat inside source list 100 interface Ethernet0/1 overload
 interface Ethernet0/1
