@@ -581,4 +581,5 @@ Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn St
 ```
 Как видим, bgp поднялся только с LEAF-1, заглянем в логи:
 ```
+PE-1 rpd[2341]: bgp_read_v4_message:10756: NOTIFICATION received from 100.100.100.2 (External AS 65001): code 4 (Hold Timer Expired Error), socket buffer sndcc: 57 rcvcc: 0 TCP state: 5, snd_una: 3892312450 snd_nxt: 3892312507 snd_wnd: 16384 rcv_nxt: 3260594691 rcv_adv: 3260611579, hold timer out 90s, hold timer remain 43.647005s
 ```
