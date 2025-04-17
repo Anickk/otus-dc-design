@@ -583,3 +583,85 @@ Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn St
 ```
 PE-1 rpd[2341]: bgp_read_v4_message:10756: NOTIFICATION received from 100.100.100.2 (External AS 65001): code 4 (Hold Timer Expired Error), socket buffer sndcc: 57 rcvcc: 0 TCP state: 5, snd_una: 3892312450 snd_nxt: 3892312507 snd_wnd: 16384 rcv_nxt: 3260594691 rcv_adv: 3260611579, hold timer out 90s, hold timer remain 43.647005s
 ```
+Это можно объяснить тем, что трафик предназначающийся одному лифу, может передаваться через другой из-за балансировки lacp, и трафик передается через evpn. bgp по умолчанию отправляет пакеты с TTL=1, что не позволяет установить сессию из-за наличия хопов в evpn. Включим мультихоп везде:
+
+Leaf:
+```
+set routing-instances WAN protocols bgp group PE multihop
+```
+PE:
+```
+set protocols bgp group LEAF multihop
+```
+---
+**После применения этой конфигурации у меня ничего не изменилось, я добавил команду на leaf коммутаторах - set protocols evpn default-gateway no-gateway-community, эта команда отключает добавление evpn default-gateway, что позволяет коммутаторам ипортировать маршруты с других лифов, даже если у них такойже mac/ip как у локального интерфейса. Я не понял как это могло помочь, не ломает ли эта команда другую логику работы, мешает ли наличие или отсутствие этой команды агрегату, но после ее применения поднялись все сессии. После завершения лабы я игрался с этим параметром, включал-отключал, что приводило к совершенно разным последствием, то перестовали пенгаться лифы с пешек, то переставал пенгаться один лиф, то все хорошо, несколько раз у меня крашились джуны, но в конечном итоге все заработало и без наличия этой команды. Возможно это просто проблемы виртуальной среды. Так же хотел получить комментарии по этому поводу, и в целом о топологии, стоит ли так подключать роутеры и строить маршрутизацию, или есть какойто другой бест практис?**
+---
+
+Проверяем соседства:
+```
+root@PE-1> show bgp summary      
+Groups: 1 Peers: 2 Down peers: 0
+Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
+inet.0               
+                       8          4          0          0          0          0
+Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
+100.100.100.2         65001         56         58       0       1       24:27 2/4/4/0              0/0/0/0
+100.100.100.3         65002          4          3       0       1           2 2/4/4/0              0/0/0/0
+
+```
+
+Соседства поднялись, по каунтерам мы видим что маршруты появились, проверим доступ в интернет с VM:
+```
+gns3@box:~$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN 
+    link/ether 16:0d:09:73:c2:a8 brd ff:ff:ff:ff:ff:ff
+3: tunl0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+4: ip_vti0@NONE: <NOARP> mtu 1364 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 50:cf:4c:00:09:00 brd ff:ff:ff:ff:ff:ff
+    inet 100.64.10.200/24 brd 100.64.10.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::52cf:4cff:fe00:900/64 scope link 
+       valid_lft forever preferred_lft forever
+gns3@box:~$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: seq=0 ttl=102 time=124.522 ms
+64 bytes from 8.8.8.8: seq=1 ttl=102 time=183.804 ms
+64 bytes from 8.8.8.8: seq=2 ttl=102 time=200.230 ms
+64 bytes from 8.8.8.8: seq=3 ttl=102 time=141.563 ms
+64 bytes from 8.8.8.8: seq=4 ttl=102 time=119.853 ms
+64 bytes from 8.8.8.8: seq=5 ttl=102 time=132.103 ms
+^C
+--- 8.8.8.8 ping statistics ---
+6 packets transmitted, 6 packets received, 0% packet loss
+round-trip min/avg/max = 119.853/150.345/200.230 ms
+```
+
+Доступ в интернет есть, все работает.
+
+Убедимся что рабоает мультипас:
+```
+WAN.inet.0: 11 destinations, 15 routes (11 active, 0 holddown, 0 hidden)
+@ = Routing Use Only, # = Forwarding Use Only
++ = Active Route, - = Last Active, * = Both
+
+0.0.0.0/0          *[BGP/170] 00:40:24, localpref 100, from 100.100.200.1
+                      AS path: 65200 I, validation-state: unverified
+                    > to 100.100.100.1 via irb.1000
+                      to 100.100.200.1 via irb.2000
+                    [BGP/170] 00:40:24, localpref 100
+                      AS path: 65100 I, validation-state: unverified
+                    > to 100.100.100.1 via irb.1000
+                    [EVPN/170] 00:15:59
+                    > to 10.100.0.0 via xe-0/0/0.0
+                      to 10.100.0.4 via xe-0/0/1.0
+```
+Как мы видим, все работает.
