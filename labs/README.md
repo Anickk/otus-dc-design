@@ -5,3 +5,4 @@
  - [Lab4. Построение Underlay сети на eBGP](lab4/)
  - [Lab5. VxLAN. EVPN L2](lab5/)
  - [Lab6. VxLAN. EVPN L3](lab6/)
+ - [Lab7. VxLAN. Аналоги VPC](lab7/)
