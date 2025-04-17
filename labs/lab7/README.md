@@ -567,3 +567,18 @@ routing-instances {
     }
 }
 ```
+
+Посмотрим статус пиров со стороны PE-1:
+```
+root@PE-1> show bgp summary 
+Groups: 1 Peers: 2 Down peers: 1
+Table          Tot Paths  Act Paths Suppressed    History Damp State    Pending
+inet.0               
+                       4          3          0          0          0          0
+Peer                     AS      InPkt     OutPkt    OutQ   Flaps Last Up/Dwn State|#Active/Received/Accepted/Damped...
+100.100.100.2         65001          3          4       0       0          19 3/4/4/0              0/0/0/0
+100.100.100.3         65002          0          0       0       0          31 Connect
+```
+Как видим, bgp поднялся только с LEAF-1, заглянем в логи:
+```
+```
