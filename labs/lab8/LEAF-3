@@ -1,0 +1,261 @@
+## Last changed: 2025-04-22 18:21:58 UTC
+version 20.3R1.8;
+system {
+    host-name LEAF-3;
+    root-authentication {
+        encrypted-password "$6$iOHCqldH$4Bv5iM.SYPDCPExs15aDwLgKfad9fLWfdv53fovFYghTXlJ9rQVFxA9yoIUOf58hSJrXKANdZ.3L2ZWXBPs1T0"; ## SECRET-DATA
+        ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"; ## SECRET-DATA
+    }
+    login {
+        user vagrant {
+            uid 2000;
+            class super-user;
+            authentication {
+                ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"; ## SECRET-DATA
+            }
+        }
+    }
+    services {
+        ssh {
+            root-login allow;
+        }
+        netconf {
+            ssh;
+        }
+        rest {
+            http {
+                port 8080;
+            }
+            enable-explorer;
+        }
+    }
+    syslog {                            
+        user * {
+            any emergency;
+        }
+        file messages {
+            any notice;
+            authorization info;
+        }
+        file interactive-commands {
+            interactive-commands any;
+        }
+    }
+    extensions {
+        providers {
+            juniper {
+                license-type juniper deployment-scope commercial;
+            }
+            chef {
+                license-type juniper deployment-scope commercial;
+            }
+        }
+    }
+}
+chassis {                               
+    aggregated-devices {
+        ethernet {
+            device-count 100;
+        }
+    }
+}
+interfaces {
+    xe-0/0/0 {
+        description SPINE-1;
+        unit 0 {
+            family inet {
+                address 10.100.0.9/31;
+            }
+            family iso;
+        }
+    }
+    xe-0/0/1 {
+        description SPINE-2;
+        unit 0 {
+            family inet {
+                address 10.100.0.11/31;
+            }
+            family iso;                 
+        }
+    }
+    xe-0/0/2 {
+        vlan-tagging;
+        unit 300 {
+            vlan-id 300;
+            family inet {
+                address 100.100.1.2/24;
+            }
+        }
+        unit 400 {
+            vlan-id 400;
+            family inet {
+                address 100.100.2.2/24;
+            }
+        }
+    }
+    em1 {
+        unit 0 {
+            family inet {
+                address 169.254.0.2/24;
+            }
+        }                               
+    }
+    lo0 {
+        unit 0 {
+            family inet {
+                address 10.200.0.5/32;
+            }
+            family iso {
+                address 49.0001.0000.0000.0005.00;
+            }
+        }
+    }
+}
+forwarding-options {
+    storm-control-profiles default {
+        all;
+    }
+    ##
+    ## Warning: configuration block ignored: unsupported platform (vqfx-10000)
+    ##
+    vxlan-routing {
+        overlay-ecmp;
+    }
+}                                       
+policy-options {
+    policy-statement load-balancing-policy {
+        then {
+            load-balance per-packet;
+        }
+    }
+}
+routing-instances {
+    VRF-1 {
+        routing-options {
+            static {
+                route 0.0.0.0/0 next-hop 100.100.1.1;
+            }
+            multipath {
+                vpn-unequal-cost equal-external-internal;
+            }
+            auto-export;
+        }
+        protocols {
+            evpn {
+                ip-prefix-routes {
+                    advertise direct-nexthop;
+                    encapsulation vxlan;
+                    vni 65002;
+                }
+            }
+        }
+        instance-type vrf;
+        interface xe-0/0/2.300;
+        route-distinguisher 10.200.0.5:101;
+        vrf-target target:65002:1;
+        vrf-table-label;
+    }
+    VRF-2 {
+        routing-options {
+            static {
+                route 0.0.0.0/0 next-hop 100.100.2.1;
+            }
+            multipath {
+                vpn-unequal-cost equal-external-internal;
+            }
+            auto-export;
+        }
+        protocols {
+            evpn {
+                ip-prefix-routes {      
+                    advertise direct-nexthop;
+                    encapsulation vxlan;
+                    vni 65003;
+                }
+            }
+        }
+        instance-type vrf;
+        interface xe-0/0/2.400;
+        route-distinguisher 10.200.0.5:102;
+        vrf-target target:65003:1;
+        vrf-table-label;
+    }
+}
+routing-options {
+    forwarding-table {
+        export load-balancing-policy;
+        dynamic-list-next-hop;
+        chained-composite-next-hop {
+            ingress {
+                evpn;
+            }
+        }
+    }                                   
+    router-id 10.200.0.5;
+    autonomous-system 65000;
+}
+protocols {
+    bgp {
+        group OVERLAY {
+            type internal;
+            local-address 10.200.0.5;
+            family evpn {
+                signaling;
+            }
+            neighbor 10.200.0.1 {
+                description SPINE-1;
+            }
+            neighbor 10.200.0.2 {
+                description SPINE-2;
+            }
+        }
+    }
+    evpn {
+        encapsulation vxlan;
+        multicast-mode ingress-replication;
+        extended-vni-list all;          
+    }
+    isis {
+        interface xe-0/0/0.0 {
+            point-to-point;
+            bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
+                minimum-interval 300;
+                multiplier 3;
+            }
+        }
+        interface xe-0/0/1.0 {
+            point-to-point;
+            bfd-liveness-detection { ## Warning: 'bfd-liveness-detection' is deprecated
+                minimum-interval 300;
+                multiplier 3;
+            }
+        }
+        interface lo0.0 {
+            passive;
+        }
+        level 1 disable;
+        level 2 {                       
+            authentication-key "$9$1I.RylvWLNVwMWUj"; ## SECRET-DATA
+            authentication-type md5;
+            wide-metrics-only;
+        }
+    }
+    igmp-snooping {
+        vlan default;
+    }
+}
+switch-options {
+    vtep-source-interface lo0.0;
+    route-distinguisher 10.200.0.5:1;
+    vrf-target {
+        target:1:1;
+        auto;
+    }
+}
+vlans {
+    default {
+        vlan-id 1;
+    }
+}
+                                        
+{master:0}
