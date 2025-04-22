@@ -6,4 +6,4 @@
  - [Lab5. VxLAN. EVPN L2](lab5/)
  - [Lab6. VxLAN. EVPN L3](lab6/)
  - [Lab7. VxLAN. Аналоги VPC](lab7/)
- - [Lab7. Оптимизация таблиц маршрутизации](lab8/)
+ - [Lab8. Оптимизация таблиц маршрутизации](lab8/)
