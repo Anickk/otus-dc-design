@@ -215,5 +215,36 @@ VRF-1.evpn.0: 3 destinations, 5 routes (3 active, 0 holddown, 0 hidden)
 Как видим, маршруты имеются. На Leaf-2 ситуация аналогична для своей VRF. Проверим свзность VM-1 с внешним миром и VM-2.
 
 ```
-
+gns3@box:~$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: seq=0 ttl=102 time=506.276 ms
+64 bytes from 8.8.8.8: seq=1 ttl=102 time=322.097 ms
+64 bytes from 8.8.8.8: seq=2 ttl=102 time=355.905 ms
+^C
+--- 8.8.8.8 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 322.097/394.759/506.276 ms
+gns3@box:~$ ping 100.64.20.200
+PING 100.64.20.200 (100.64.20.200): 56 data bytes
+64 bytes from 100.64.20.200: seq=0 ttl=60 time=785.602 ms
+64 bytes from 100.64.20.200: seq=1 ttl=60 time=891.008 ms
+64 bytes from 100.64.20.200: seq=2 ttl=60 time=702.830 ms
+^C
+--- 100.64.20.200 ping statistics ---
+4 packets transmitted, 3 packets received, 25% packet loss
+round-trip min/avg/max = 702.830/793.146/891.008 ms
 ```
+
+Как видим связность есть, все работает, и на этом стоило бы завершить, НО, попробуем пингануть с VM-1 шлюз расположенный на Leaf-2:
+```
+gns3@box:~$ ping 100.64.20.1
+PING 100.64.20.1 (100.64.20.1): 56 data bytes
+^C
+--- 100.64.20.1 ping statistics ---
+3 packets transmitted, 0 packets received, 100% packet loss
+```
+
+Связности нет, что-то не так, подумал я, убил кучу времени на исследование, и выяснил следующее:\
+В виртуальной инфраструктуре используется JunOS 18.x, и этой версии для корректной работы EVPN необходимы как маршруты type 5, так и маршруты type 2. Без Type 2 control-plane не формирует полные ARP-записи, и, несмотря на наличие маршрута в data-plane, удалённый leaf не может вернуть ответ, так как не знает MAC-адрес назначения. Forwarding при этом работает корректно.\
+Тоесть чтобы заработала связность между VM-1 и Leaf-2, нам нужно создать оба l2 vni c l3 интерфейсами и anycast gw.\
+А вот например в версии JunOS 22.x это пофикшено, и достаточно иметь irb интерфейс только на том Leaf коммутаторе, где он действительно необходим.\
