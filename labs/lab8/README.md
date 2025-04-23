@@ -161,6 +161,22 @@ routing-instances {
         vrf-table-label;
     }
 }
+interfaces {
+    xe-0/0/2 {
+        vlan-tagging;
+        unit 300 {
+            vlan-id 300;
+            family inet {
+                address 100.100.1.2/24;
+            }
+        }
+        unit 400 {
+            vlan-id 400;
+            family inet {
+                address 100.100.2.2/24;
+            }
+        }
+    }
 ```
 
 l2 vni мы при этом не создаем, будем использовать только type 5 маршруты.
