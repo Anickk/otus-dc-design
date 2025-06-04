@@ -6,3 +6,4 @@
 
 ---
 ## Схема:
+![img_1.png](scheme.png)
