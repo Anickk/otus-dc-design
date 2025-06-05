@@ -36,3 +36,17 @@ P2P FABRIC:
 | SITE-B-SPINE-1      | xe-0/0/2      | SITE-B-BLEAF-1       | xe-0/0/0      | 10.100.0.10/31         | 10.100.0.11/31  |
 | SUPER-SPINE      | xe-0/0/0      | SITE-A-BLEAF-1       | xe-0/0/1      | 10.100.0.12/31         | 10.100.0.13/31  |
 | SUPER-SPINE      | xe-0/0/1      | SITE-B-BLEAF-1       | xe-0/0/1      | 10.100.0.14/31         | 10.100.0.15/31  |
+
+Loopback:
+
+| Устройство   | Интерфейс | IP-адрес       |
+|--------------|-----------|----------------|
+| SITE-A-SPINE-1       | Loopback0 | 10.200.0.1/32  |
+| SITE-B-SPINE-1      | Loopback0 | 10.200.0.2/32  |
+| SUPER-SPINE       | Loopback0 | 10.200.0.3/32  |
+| SITE-A-LEAF-1       | Loopback0 | 10.200.0.4/32  |
+| SITE-A-LEAF-2       | Loopback0 | 10.200.0.5/32  |
+| SITE-A-BLEAF-1       | Loopback0 | 10.200.0.6/32  |
+| SITE-B-LEAF-1       | Loopback0 | 10.200.0.7/32  |
+| SITE-B-LEAF-2       | Loopback0 | 10.200.0.8/32  |
+| SITE-B-BLEAF-1       | Loopback0 | 10.200.0.9/32  |
