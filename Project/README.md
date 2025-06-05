@@ -121,3 +121,4 @@ Loopback:
 iBGP - 65000
 Site-A - 65010
 Site-B - 65020
+SUPER-SPINE - 65001
