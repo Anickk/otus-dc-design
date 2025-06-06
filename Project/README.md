@@ -5276,3 +5276,156 @@ bgp.evpn.0: 71 destinations, 71 routes (71 active, 0 holddown, 0 hidden)
 
 {master:0}
 ```
+
+## Просмотр данных с роутеров:
+
+Команды используемые для анализа:
+
+show bgp summary\
+show ip route
+
+SITE-A-PE-1:
+```
+SITE-A-PE-1#show bgp su
+BGP router identifier 100.64.0.1, local AS number 65101
+BGP table version is 64, main routing table version 64
+11 network entries using 1584 bytes of memory
+17 path entries using 1428 bytes of memory
+5 multipath network entries and 10 multipath paths
+7/4 BGP path/bestpath attribute entries using 1120 bytes of memory
+3 BGP AS-PATH entries using 72 bytes of memory
+4 BGP extended community entries using 144 bytes of memory
+0 BGP route-map cache entries using 0 bytes of memory
+0 BGP filter-list cache entries using 0 bytes of memory
+BGP using 4348 total bytes of memory
+BGP activity 14/3 prefixes, 44/27 paths, scan interval 60 secs
+
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+100.64.0.2      4        65000     231     235       64    0    0 01:39:25        6
+100.64.0.3      4        65000     229     232       64    0    0 01:39:14        6
+100.64.40.3     4        65200     108     112       64    0    0 01:25:20        4
+SITE-A-PE-1#sh ip ro
+SITE-A-PE-1#sh ip route 
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is 10.0.137.1 to network 0.0.0.0
+
+S*    0.0.0.0/0 [254/0] via 10.0.137.1
+      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        10.0.137.0/24 is directly connected, Ethernet0/0
+L        10.0.137.52/32 is directly connected, Ethernet0/0
+      100.0.0.0/8 is variably subnetted, 12 subnets, 2 masks
+C        100.64.0.0/24 is directly connected, Ethernet0/1.1000
+L        100.64.0.1/32 is directly connected, Ethernet0/1.1000
+B        100.64.10.0/24 [20/0] via 100.64.0.3, 01:38:48
+                        [20/0] via 100.64.0.2, 01:38:48
+B        100.64.20.0/24 [20/0] via 100.64.0.3, 01:39:17
+                        [20/0] via 100.64.0.2, 01:39:17
+B        100.64.30.0/24 [20/0] via 100.64.0.3, 01:38:25
+                        [20/0] via 100.64.0.2, 01:38:25
+C        100.64.40.0/24 is directly connected, Ethernet0/1.400
+L        100.64.40.1/32 is directly connected, Ethernet0/1.400
+```
+
+SITE-B-PE-1:
+```
+SITE-B-PE-1#sh bgp sum
+BGP router identifier 10.0.137.236, local AS number 65102
+BGP table version is 86, main routing table version 86
+11 network entries using 1584 bytes of memory
+20 path entries using 1680 bytes of memory
+4 multipath network entries and 8 multipath paths
+8/5 BGP path/bestpath attribute entries using 1280 bytes of memory
+4 BGP AS-PATH entries using 96 bytes of memory
+4 BGP extended community entries using 144 bytes of memory
+0 BGP route-map cache entries using 0 bytes of memory
+0 BGP filter-list cache entries using 0 bytes of memory
+BGP using 4784 total bytes of memory
+BGP activity 21/10 prefixes, 55/35 paths, scan interval 60 secs
+
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+100.64.0.5      4        65000      35      38       86    0    0 00:12:24        6
+100.64.0.6      4        65000      36      37       86    0    0 00:12:25        6
+100.64.40.3     4        65200      27      27       86    0    0 00:17:24        7
+SITE-B-PE-1#sh ip ro
+SITE-B-PE-1#sh ip route 
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is 100.64.40.1 to network 0.0.0.0
+
+B*    0.0.0.0/0 [20/0] via 100.64.40.1, 00:17:26
+      10.0.0.0/8 is variably subnetted, 3 subnets, 2 masks
+C        10.0.137.0/24 is directly connected, Ethernet0/0
+S        10.0.137.1/32 [254/0] via 10.0.137.1, Ethernet0/0
+L        10.0.137.236/32 is directly connected, Ethernet0/0
+      100.0.0.0/8 is variably subnetted, 12 subnets, 2 masks
+C        100.64.0.0/24 is directly connected, Ethernet0/1.1000
+L        100.64.0.4/32 is directly connected, Ethernet0/1.1000
+B        100.64.10.0/24 [20/0] via 100.64.0.6, 00:12:27
+                        [20/0] via 100.64.0.5, 00:12:27
+B        100.64.20.0/24 [20/0] via 100.64.40.1, 00:17:26
+B        100.64.30.0/24 [20/0] via 100.64.0.6, 00:12:27
+                        [20/0] via 100.64.0.5, 00:12:27
+C        100.64.40.0/24 is directly connected, Ethernet0/1.400
+L        100.64.40.2/32 is directly connected, Ethernet0/1.400
+```
+
+SITE-B-R-1:
+```
+SITE-B-R-1#sh bgp sum
+BGP router identifier 100.64.40.3, local AS number 65200
+BGP table version is 24, main routing table version 24
+11 network entries using 1584 bytes of memory
+15 path entries using 1260 bytes of memory
+5/3 BGP path/bestpath attribute entries using 800 bytes of memory
+5 BGP AS-PATH entries using 136 bytes of memory
+0 BGP route-map cache entries using 0 bytes of memory
+0 BGP filter-list cache entries using 0 bytes of memory
+BGP using 3780 total bytes of memory
+BGP activity 13/2 prefixes, 24/9 paths, scan interval 60 secs
+
+Neighbor        V           AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+100.64.40.1     4        65101     114     110       24    0    0 01:27:12        8
+100.64.40.2     4        65102      28      28       24    0    0 00:18:14        7
+SITE-B-R-1#sh ip ro
+SITE-B-R-1#sh ip route 
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
+       D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area 
+       N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2
+       E1 - OSPF external type 1, E2 - OSPF external type 2
+       i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2
+       ia - IS-IS inter area, * - candidate default, U - per-user static route
+       o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP
+       a - application route
+       + - replicated route, % - next hop override, p - overrides from PfR
+
+Gateway of last resort is 100.64.40.1 to network 0.0.0.0
+
+B*    0.0.0.0/0 [20/0] via 100.64.40.1, 00:31:02
+      10.0.0.0/8 is variably subnetted, 2 subnets, 2 masks
+C        10.0.0.0/24 is directly connected, Ethernet0/1
+L        10.0.0.1/32 is directly connected, Ethernet0/1
+      100.0.0.0/8 is variably subnetted, 12 subnets, 2 masks
+B        100.64.0.0/24 [20/0] via 100.64.40.1, 00:31:02
+B        100.64.10.0/24 [20/0] via 100.64.40.1, 00:31:02
+B        100.64.20.0/24 [20/0] via 100.64.40.1, 01:27:14
+B        100.64.30.0/24 [20/0] via 100.64.40.2, 00:13:17
+C        100.64.40.0/24 is directly connected, Ethernet0/0
+L        100.64.40.3/32 is directly connected, Ethernet0/0
+```
