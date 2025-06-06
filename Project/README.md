@@ -144,3 +144,116 @@ ISO Loopback:
 - [SITE-B-PE-1](SITE-B-PE-1.manifest)
 - [SITE-B-R-1](SITE-B-R-1.manifest)
 
+## Проверки связности:
+
+Проверка выхода в интернет с хоста SITE-A-HOST_L2-1 и связность с хостом SITE-B-HOST_L2-1 по L2:
+```
+gns3@box:~$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN 
+    link/ether 2a:c7:de:7f:d1:7e brd ff:ff:ff:ff:ff:ff
+3: tunl0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+4: ip_vti0@NONE: <NOARP> mtu 1364 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 50:14:02:00:33:00 brd ff:ff:ff:ff:ff:ff
+    inet 100.64.10.10/24 brd 100.64.10.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::5214:2ff:fe00:3300/64 scope link 
+       valid_lft forever preferred_lft forever
+gns3@box:~$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: seq=0 ttl=111 time=102.966 ms
+64 bytes from 8.8.8.8: seq=1 ttl=111 time=178.607 ms
+64 bytes from 8.8.8.8: seq=2 ttl=111 time=104.421 ms
+64 bytes from 8.8.8.8: seq=3 ttl=111 time=112.692 ms
+^C
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 4 packets received, 0% packet loss
+round-trip min/avg/max = 102.966/124.671/178.607 ms
+gns3@box:~$ ping 100.64.10.20
+PING 100.64.10.20 (100.64.10.20): 56 data bytes
+64 bytes from 100.64.10.20: seq=0 ttl=64 time=399.797 ms
+64 bytes from 100.64.10.20: seq=1 ttl=64 time=295.632 ms
+^C
+--- 100.64.10.20 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 102.966/124.671/178.607 ms
+gns3@box:~$
+```
+Проверка выхода в интернет с хоста SITE-B-HOST_L3-1 и проверкасвязности со всеми хостами по L3:
+
+```
+gns3@box:~$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN 
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: dummy0: <BROADCAST,NOARP> mtu 1500 qdisc noop state DOWN 
+    link/ether 26:62:ba:bc:e2:f4 brd ff:ff:ff:ff:ff:ff
+3: tunl0@NONE: <NOARP> mtu 1480 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+4: ip_vti0@NONE: <NOARP> mtu 1364 qdisc noop state DOWN 
+    link/ipip 0.0.0.0 brd 0.0.0.0
+5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP qlen 1000
+    link/ether 50:0f:58:00:36:00 brd ff:ff:ff:ff:ff:ff
+    inet 100.64.30.10/24 brd 100.64.30.255 scope global eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::520f:58ff:fe00:3600/64 scope link 
+       valid_lft forever preferred_lft forever
+gns3@box:~$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8): 56 data bytes
+64 bytes from 8.8.8.8: seq=0 ttl=110 time=1108.304 ms
+64 bytes from 8.8.8.8: seq=1 ttl=110 time=431.876 ms
+64 bytes from 8.8.8.8: seq=2 ttl=110 time=474.513 ms
+^C
+--- 8.8.8.8 ping statistics ---
+4 packets transmitted, 3 packets received, 25% packet loss
+round-trip min/avg/max = 431.876/671.564/1108.304 ms
+gns3@box:~$ ping 100.64.10.10
+PING 100.64.10.10 (100.64.10.10): 56 data bytes
+64 bytes from 100.64.10.10: seq=0 ttl=62 time=371.662 ms
+64 bytes from 100.64.10.10: seq=1 ttl=62 time=485.039 ms
+64 bytes from 100.64.10.10: seq=2 ttl=62 time=474.585 ms
+^C
+--- 100.64.10.10 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 371.662/443.762/485.039 ms
+gns3@box:~$ ping 100.64.10.20
+PING 100.64.10.20 (100.64.10.20): 56 data bytes
+64 bytes from 100.64.10.20: seq=0 ttl=62 time=280.365 ms
+64 bytes from 100.64.10.20: seq=1 ttl=62 time=282.422 ms
+64 bytes from 100.64.10.20: seq=2 ttl=62 time=273.313 ms
+^C
+--- 100.64.10.20 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 273.313/278.700/282.422 ms
+gns3@box:~$ ping 100.64.20.10
+PING 100.64.20.10 (100.64.20.10): 56 data bytes
+64 bytes from 100.64.20.10: seq=0 ttl=62 time=361.094 ms
+64 bytes from 100.64.20.10: seq=1 ttl=62 time=426.238 ms
+64 bytes from 100.64.20.10: seq=2 ttl=62 time=172.305 ms
+^C
+--- 100.64.20.10 ping statistics ---
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max = 172.305/319.879/426.238 ms
+gns3@box:~$ ping 100.64.40.3
+PING 100.64.40.3 (100.64.40.3): 56 data bytes
+64 bytes from 100.64.40.3: seq=0 ttl=252 time=1222.672 ms
+64 bytes from 100.64.40.3: seq=1 ttl=252 time=848.290 ms
+64 bytes from 100.64.40.3: seq=2 ttl=252 time=692.158 ms
+^C
+--- 100.64.40.3 ping statistics ---
+4 packets transmitted, 3 packets received, 25% packet loss
+round-trip min/avg/max = 692.158/921.040/1222.672 ms
+gns3@box:~$
+```
+
