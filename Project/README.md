@@ -258,7 +258,8 @@ gns3@box:~$
 ```
 ## Просмотр данных с коммутаторов:
 
-Команды используемые для анализа:\
+Команды используемые для анализа:
+
 show bgp summary\
 show ethernet-switching vxlan-tunnel-end-point remote\
 show ethernet-switching vxlan-tunnel-end-point source\
