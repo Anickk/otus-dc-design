@@ -256,4 +256,12 @@ PING 100.64.40.3 (100.64.40.3): 56 data bytes
 round-trip min/avg/max = 692.158/921.040/1222.672 ms
 gns3@box:~$
 ```
+## Просмотр данных с коммутаторов:
 
+Команды используемые для анализа:\
+show bgp summary\
+show ethernet-switching vxlan-tunnel-end-point remote\
+show ethernet-switching vxlan-tunnel-end-point source\
+show ethernet-switching table\
+show evpn database\
+show route
