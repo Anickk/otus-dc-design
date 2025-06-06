@@ -1,0 +1,141 @@
+Building configuration...
+
+Current configuration : 1447 bytes
+!
+! Last configuration change at 12:32:10 UTC Fri Jun 6 2025
+!
+version 15.7
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SITE-B-R-1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ ip address 100.64.40.3 255.255.255.0
+ ip nat outside
+ ip virtual-reassembly in
+ duplex auto
+!
+interface Ethernet0/1
+ ip address 10.0.0.1 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly in
+ duplex auto
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+ duplex auto
+!
+router bgp 65200
+ bgp log-neighbor-changes
+ neighbor 100.64.40.1 remote-as 65101
+ neighbor 100.64.40.2 remote-as 65102
+ !
+ address-family ipv4
+  neighbor 100.64.40.1 activate
+  neighbor 100.64.40.2 activate
+  maximum-paths 10
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip nat inside source list 100 interface Ethernet0/0 overload
+!
+ipv6 ioam timestamp
+!
+!
+access-list 100 permit ip any any
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+!         
+end

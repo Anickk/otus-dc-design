@@ -1,0 +1,164 @@
+Building configuration...
+
+Current configuration : 2065 bytes
+!
+! Last configuration change at 12:21:32 UTC Fri Jun 6 2025
+! NVRAM config last updated at 12:21:32 UTC Fri Jun 6 2025
+!
+version 15.7
+service config
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SITE-B-PE-1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+!
+!
+!         
+!
+no ip domain lookup
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!         
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Ethernet0/0
+ description INET
+ ip address dhcp
+ ip nat outside
+ ip virtual-reassembly in
+ duplex auto
+!
+interface Ethernet0/1
+ description SITE-B-LEAF-1/2
+ no ip address
+ duplex auto
+!
+interface Ethernet0/1.400
+ encapsulation dot1Q 400
+ ip address 100.64.40.2 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly in
+!
+interface Ethernet0/1.1000
+ encapsulation dot1Q 1000
+ ip address 100.64.0.4 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly in
+!
+interface Ethernet0/2
+ no ip address
+ shutdown
+ duplex auto
+!
+interface Ethernet0/3
+ no ip address
+ shutdown
+ duplex auto
+!
+router bgp 65102
+ bgp log-neighbor-changes
+ neighbor 100.64.0.5 remote-as 65000
+ neighbor 100.64.0.5 ebgp-multihop 10
+ neighbor 100.64.0.6 remote-as 65000
+ neighbor 100.64.0.6 ebgp-multihop 10
+ neighbor 100.64.40.3 remote-as 65200
+ !
+ address-family ipv4
+  neighbor 100.64.0.5 activate
+  neighbor 100.64.0.5 default-originate
+  neighbor 100.64.0.6 activate
+  neighbor 100.64.0.6 default-originate
+  neighbor 100.64.40.3 activate
+  neighbor 100.64.40.3 default-originate
+  maximum-paths 10
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip nat inside source list 100 interface Ethernet0/0 overload
+!
+ipv6 ioam timestamp
+!
+!
+access-list 100 permit ip any any
+!
+control-plane
+!
+!
+!
+!
+!
+!
+!
+!
+line con 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+ntp server pool.ntp.org
+ntp server 34.208.249.133
+!         
+end

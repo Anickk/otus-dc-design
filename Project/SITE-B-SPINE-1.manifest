@@ -1,0 +1,50 @@
+set version 20.3R1.8
+set system host-name SITE-B-SPINE-1
+set system root-authentication encrypted-password "$6$iOHCqldH$4Bv5iM.SYPDCPExs15aDwLgKfad9fLWfdv53fovFYghTXlJ9rQVFxA9yoIUOf58hSJrXKANdZ.3L2ZWXBPs1T0"
+set system root-authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
+set system login user vagrant uid 2000
+set system login user vagrant class super-user
+set system login user vagrant authentication ssh-rsa "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key"
+set system services ssh root-login allow
+set system services netconf ssh
+set system services rest http port 8080
+set system services rest enable-explorer
+set system syslog user * any emergency
+set system syslog file messages any notice
+set system syslog file messages authorization info
+set system syslog file interactive-commands interactive-commands any
+set system extensions providers juniper license-type juniper deployment-scope commercial
+set system extensions providers chef license-type juniper deployment-scope commercial
+set interfaces xe-0/0/0 description SITE-B-LEAF-1
+set interfaces xe-0/0/0 unit 0 family inet address 10.100.0.6/31
+set interfaces xe-0/0/0 unit 0 family iso
+set interfaces xe-0/0/1 description SITE-B-LEAF-2
+set interfaces xe-0/0/1 unit 0 family inet address 10.100.0.8/31
+set interfaces xe-0/0/1 unit 0 family iso
+set interfaces xe-0/0/2 description SITE-B-BLEAF-1
+set interfaces xe-0/0/2 unit 0 family inet address 10.100.0.10/31
+set interfaces xe-0/0/2 unit 0 family iso
+set interfaces em1 unit 0 family inet address 169.254.0.2/24
+set interfaces lo0 description OVERLAY
+set interfaces lo0 unit 0 family inet address 10.200.0.2/32
+set interfaces lo0 unit 0 family iso address 49.0001.0000.0000.0002.00
+set forwarding-options storm-control-profiles default all
+set policy-options policy-statement load-balancing-policy then load-balance per-packet
+set routing-options forwarding-table export load-balancing-policy
+set routing-options router-id 10.200.0.2
+set routing-options autonomous-system 65000
+set protocols bgp group OVERLAY type internal
+set protocols bgp group OVERLAY local-address 10.200.0.2
+set protocols bgp group OVERLAY family evpn signaling
+set protocols bgp group OVERLAY cluster 10.200.0.2
+set protocols bgp group OVERLAY neighbor 10.200.0.7 description SITE-B-LEAF-1
+set protocols bgp group OVERLAY neighbor 10.200.0.8 description SITE-B-LEAF-2
+set protocols bgp group OVERLAY neighbor 10.200.0.9 description SITE-B-BLEAF-1
+set protocols isis interface xe-0/0/0.0 point-to-point
+set protocols isis interface xe-0/0/1.0 point-to-point
+set protocols isis interface xe-0/0/2.0 point-to-point
+set protocols isis interface lo0.0 passive
+set protocols isis level 1 disable
+set protocols isis level 2 wide-metrics-only
+set protocols igmp-snooping vlan default
+set vlans default vlan-id 1
