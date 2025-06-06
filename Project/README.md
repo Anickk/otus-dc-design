@@ -131,7 +131,7 @@ ISO Loopback:
 
 ## Конфиги:
 
-- [SITE-A-LEAF-1](LEAF-1)
+- [SITE-A-LEAF-1](SITE-A-LEAF-1)
 - [SITE-A-LEAF-2](LEAF-2)
 - [SITE-A-BLEAF-1](SPINE-1)
 - [SITE-A-SPINE-1](SPINE-2)
