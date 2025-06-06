@@ -126,3 +126,4 @@ ISO Loopback:
 | SUPER-SPINE       | 65001 |
 | SITE-A-PE-1       | 65101 |
 | SITE-A-PE-1       | 65102 |
+| CLIENT_BGP       | 65200 |
